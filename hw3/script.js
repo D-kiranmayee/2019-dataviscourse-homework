@@ -5,7 +5,15 @@
  */
 function staircase() {
   // ****** TODO: PART II ******
-  //test
+  bars=document.getElementById("aBarChart");
+  var c= bars.children;
+  var l= c.length;
+  let increment = 30;
+  for(let i=0; i<l;i++)
+      {
+      c[i].setAttribute('width',increment)
+      increment+=25;
+    }
 }
 
 /**
@@ -49,15 +57,33 @@ function update(data) {
   // ****** TODO: PART III (you will also edit in PART V) ******
 
   // TODO: Select and update the 'a' bar chart bars
+  let sel = d3.select('#aBarChart');
+  sel.selectAll("rect")
+          .data(data)
+          .join("rect")
+          .attr("width",d => {return aScale(d.a);})
+          .attr("height", 18);
+
 
   // TODO: Select and update the 'b' bar chart bars
-
+  let sel_b = d3.select('#bBarChart');
+  sel_b.selectAll("rect")
+          .data(data)
+          .join("rect")
+          .attr("width",d => {return bScale(d.b);})
+          .attr("height", 18);
   // TODO: Select and update the 'a' line chart path using this line generator
 
   let aLineGenerator = d3
     .line()
     .x((d, i) => iScale(i))
     .y(d => aScale(d.a));
+
+    line_a = d3.select('aLineChart');
+    line_a.data(data)
+          .join("line")
+          .attr("x1", d => {return iScale(d.a);});
+
 
   // TODO: Select and update the 'b' line chart path (create your own generator)
 
@@ -80,6 +106,7 @@ function update(data) {
  */
 async function changeData() {
   //  Load the file indicated by the select menu
+  console.log("yes");
   let dataFile = document.getElementById("dataset").value;
   try {
     const data = await d3.csv("data/" + dataFile + ".csv");
