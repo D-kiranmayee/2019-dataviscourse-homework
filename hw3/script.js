@@ -5,6 +5,7 @@
  */
 function staircase() {
   // ****** TODO: PART II ******
+  //test
 }
 
 /**
