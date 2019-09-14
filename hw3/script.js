@@ -16,6 +16,20 @@ function staircase() {
     }
 }
 
+function hovernow(){
+
+   let rid = document.getElementById("aBarChart");
+   let c= rid.children;
+   let len = c.length;
+   for(i=0; i< len; i++)
+   {
+      console.log(c[i]);
+         c[i].addEventListener("mouseover", RespondMouseOver());
+         function RespondMouseOver() {
+                c[i].style.fill = "yellow";
+              }
+}
+}
 /**
  * Render the visualizations
  * @param data
@@ -79,14 +93,26 @@ function update(data) {
     .x((d, i) => iScale(i))
     .y(d => aScale(d.a));
 
-    line_a = d3.select('aLineChart');
+    line_a = d3.select('#aLineChart');
     line_a.data(data)
-          .join("line")
-          .attr("x1", d => {return iScale(d.a);});
+          .join("path")
+          .attr("d", d => {return aLineGenerator(data);})
+        //  .attr("transform","translate(0,100)")
+          .attr("transform","scale(2,2)");
+
 
 
   // TODO: Select and update the 'b' line chart path (create your own generator)
+  let bLineGenerator = d3.line()
+                          .x((d, i) => iScale(i))
+                          .y(d => aScale(d.b));
 
+  line_b = d3.select('#bLineChart');
+  line_b.data(data)
+        .join("path")
+        .attr("d", d => {return bLineGenerator(data);})
+                              //  .attr("transform","translate(0,100)")
+        .attr("transform","scale(2,2)");
   // TODO: Select and update the 'a' area chart path using this area generator
   let aAreaGenerator = d3
     .area()
@@ -94,11 +120,76 @@ function update(data) {
     .y0(0)
     .y1(d => aScale(d.a));
 
+    area_a = d3.select('#aAreaChart');
+    area_a.data(data)
+          .join("path")
+          .attr("d", d => {return aAreaGenerator(data);})
+          .attr("transform","translate(300,150)")
+          .attr("transform","scale(1,1)");
+
   // TODO: Select and update the 'b' area chart path (create your own generator)
+  let bAreaGenerator = d3
+    .area()
+    .x((d, i) => iScale(i))
+    .y0(0)
+    .y1(d => aScale(d.b));
+
+    area_a = d3.select('#bAreaChart');
+    area_a.data(data)
+          .join("path")
+          .attr("d", d => {return bAreaGenerator(data);})
+          .attr("transform","translate(300,150)")
+          .attr("transform","scale(1,1)");
 
   // TODO: Select and update the scatterplot points
+    let scatterplot = d3.select('#scatterplot');
+    let circles = scatterplot.selectAll("circle").data(data)
+        .join("circle")
+        .attr("cx", (d) => { return aScale(d.a); })
+        .attr("cy", (d) => { return 300-bScale(d.b); })
+        .attr("transform","translate(40,-80)")
+        .attr("r", 3)
+        .append("svg:title")
+        .text((function(d) { return d; }));
 
+        const plotDimensionX = 240;
+        const plotDimensionY = 240
+        const plot = d3.select('#scatterplot').attr('transform', `translate(30,25)`)
+
+        plot.append('rect').attr('width', plotDimensionX).attr('height', plotDimensionY);
+
+        const xScale = d3.scaleLinear().domain([0, 14]).range([0, plotDimensionX])
+        const yScale = d3.scaleLinear().domain([0, 14]).range([plotDimensionY, 0])
+
+
+        const xAxisGroup = plot.append('g').classed('x-axis', true).attr('transform', `translate(0, ${plotDimensionY})`)
+        const yAxisGroup = plot.append('g').classed('y-axis', true);
+
+        const xAxisScale = d3.axisBottom(xScale);
+        const yAxisScale = d3.axisLeft(yScale);
+        xAxisGroup.call(xAxisScale);
+        yAxisGroup.call(yAxisScale);
   // ****** TODO: PART IV ******
+  let rid = document.getElementById("aBarChart");
+  let c= rid.children;
+  let len = c.length;
+  for(let i=0; i< len; i++)
+  {
+     console.log(c[i]);
+        c[i].addEventListener("mouseover", function() {
+               c[i].style.fill = "yellow";
+             });
+      c[i].addEventListener("mouseout", function(){
+               c[i].style.fill ="red";
+             });
+
+}
+
+// scatter plots hover
+
+
+
+
 }
 
 /**
@@ -106,7 +197,6 @@ function update(data) {
  */
 async function changeData() {
   //  Load the file indicated by the select menu
-  console.log("yes");
   let dataFile = document.getElementById("dataset").value;
   try {
     const data = await d3.csv("data/" + dataFile + ".csv");
