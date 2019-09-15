@@ -70,11 +70,14 @@ function update(data) {
   sel.selectAll("rect")
       .data(data)
       .join("rect")
+      .transition()
+  .duration(1000)
       .attr("width",d => {return aScale(d.a);})
       .attr("height", 18)
       .attr("x", 0 )
       .attr("y", (d,i)=> i*20)
-      .attr("transform","scale(-1,1)");
+      .attr("transform","scale(-1,1)")
+      .delay(function(d,i){console.log(i) ; return(i*100)});
   //  sel.exit().remove();
 
   // TODO: Select and update the 'b' bar chart bars
@@ -82,10 +85,13 @@ function update(data) {
   sel_b.selectAll("rect")
           .data(data)
           .join("rect")
+          .transition()
+      .duration(1000)
           .attr("width",d => {return bScale(d.b);})
           .attr("height", 18)
           .attr("x", 0 )
-          .attr("y", (d,i)=> i*20);
+          .attr("y", (d,i)=> i*20)
+          .delay(function(d,i){console.log(i) ; return(i*100)});
   // TODO: Select and update the 'a' line chart path using this line generator
 
   let aLineGenerator = d3
@@ -96,9 +102,14 @@ function update(data) {
     line_a = d3.select('#aLineChart');
     line_a.data(data)
           .join("path")
-          .attr("d", d => {return aLineGenerator(data);})
+
         //  .attr("transform","translate(0,100)")
-          .attr("transform","scale(2,2)");
+        .style("opacity", 0)
+        .transition()
+        .duration(2000)
+         .style("opacity", 1)
+          .attr("transform","scale(2,2)")
+          .attr("d", d => {return aLineGenerator(data);});
 
 
 
@@ -110,6 +121,10 @@ function update(data) {
   line_b = d3.select('#bLineChart');
   line_b.data(data)
         .join("path")
+        .style("opacity", 0)
+        .transition()
+        .duration(2000)
+         .style("opacity", 1)
         .attr("d", d => {return bLineGenerator(data);})
                               //  .attr("transform","translate(0,100)")
         .attr("transform","scale(2,2)");
@@ -123,7 +138,11 @@ function update(data) {
     area_a = d3.select('#aAreaChart');
     area_a.data(data)
           .join("path")
+          .transition()
+      .duration(2000)
+      .style("opacity", 0)
           .attr("d", d => {return aAreaGenerator(data);})
+           .style("opacity", 1)
           .attr("transform","translate(300,150)")
           .attr("transform","scale(1,1)");
 
@@ -137,7 +156,11 @@ function update(data) {
     area_a = d3.select('#bAreaChart');
     area_a.data(data)
           .join("path")
+          .transition()
+      .duration(2000)
+      .style("opacity", 0)
           .attr("d", d => {return bAreaGenerator(data);})
+          .style("opacity", 1)
           .attr("transform","translate(300,150)")
           .attr("transform","scale(1,1)");
       area_a.exit().remove();
@@ -152,6 +175,14 @@ function update(data) {
         .attr("cy", (d) => { return 300-jyScale(d.b); })
         .attr("transform","translate(20,-30)")
         .attr("r", 3);
+/*
+    scatterplot.selectAll("circle")
+.data(data)
+    .transition()
+    .delay(function(d,i){return(i*3)})
+    .duration(2000)
+    .attr("cx", function (d) { return jjScale(d.a); } )
+    .attr("cy", function (d) { return 300-jyScale(d.b); } );*/
   //  let tt = circles.selectAll("title")
     //    .data(data);
       //  .append("title")
@@ -222,9 +253,9 @@ let ll = svgk.select('.line-chart');
 let lk = ll.selectAll('#regression-line');
   lk.data(data)
   .join("line")
-  .attr("x1", d => {return jjScale(d.a);})
-  .attr("y1", d => {return 40;})
-  .attr("x2", d => {return 70;})
+  .attr("x1", d => {return 40;})
+  .attr("y1", d => {return 200;})
+  .attr("x2", d => {return 200;})
   .attr("y2", d => {return 80;})
   ;
 
