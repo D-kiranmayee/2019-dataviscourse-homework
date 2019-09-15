@@ -12,24 +12,10 @@ function staircase() {
   for(let i=0; i<l;i++)
       {
       c[i].setAttribute('width',increment)
-      increment+=25;
+      increment+=20;
     }
 }
 
-function hovernow(){
-
-   let rid = document.getElementById("aBarChart");
-   let c= rid.children;
-   let len = c.length;
-   for(i=0; i< len; i++)
-   {
-      console.log(c[i]);
-         c[i].addEventListener("mouseover", RespondMouseOver());
-         function RespondMouseOver() {
-                c[i].style.fill = "yellow";
-              }
-}
-}
 /**
  * Render the visualizations
  * @param data
@@ -67,17 +53,29 @@ function update(data) {
     .scaleLinear()
     .domain([0, data.length])
     .range([10, 120]);
+    let jjScale = d3
+      .scaleLinear()
+      .domain([0, d3.max(data, d => d.a)])
+      .range([0, 240/19*d3.max(data,d=> d.a)]);
+
+      let jyScale = d3
+        .scaleLinear()
+        .domain([0, d3.max(data, d => d.b)])
+        .range([0, 240/19*d3.max(data,d=> d.b)]);
 
   // ****** TODO: PART III (you will also edit in PART V) ******
 
   // TODO: Select and update the 'a' bar chart bars
   let sel = d3.select('#aBarChart');
   sel.selectAll("rect")
-          .data(data)
-          .join("rect")
-          .attr("width",d => {return aScale(d.a);})
-          .attr("height", 18);
-
+      .data(data)
+      .join("rect")
+      .attr("width",d => {return aScale(d.a);})
+      .attr("height", 18)
+      .attr("x", 0 )
+      .attr("y", (d,i)=> i*20)
+      .attr("transform","scale(-1,1)");
+  //  sel.exit().remove();
 
   // TODO: Select and update the 'b' bar chart bars
   let sel_b = d3.select('#bBarChart');
@@ -85,7 +83,9 @@ function update(data) {
           .data(data)
           .join("rect")
           .attr("width",d => {return bScale(d.b);})
-          .attr("height", 18);
+          .attr("height", 18)
+          .attr("x", 0 )
+          .attr("y", (d,i)=> i*20);
   // TODO: Select and update the 'a' line chart path using this line generator
 
   let aLineGenerator = d3
@@ -140,30 +140,49 @@ function update(data) {
           .attr("d", d => {return bAreaGenerator(data);})
           .attr("transform","translate(300,150)")
           .attr("transform","scale(1,1)");
+      area_a.exit().remove();
 
   // TODO: Select and update the scatterplot points
     let scatterplot = d3.select('#scatterplot');
+    let tot =scatterplot.selectAll('g')
+      .attr("transform","translate(20,20)");
     let circles = scatterplot.selectAll("circle").data(data)
         .join("circle")
-        .attr("cx", (d) => { return aScale(d.a); })
-        .attr("cy", (d) => { return 300-bScale(d.b); })
-        .attr("transform","translate(40,-80)")
-        .attr("r", 3)
-        .append("svg:title")
-        .text((function(d) { return d; }));
+        .attr("cx", (d) => { return jjScale(d.a); })
+        .attr("cy", (d) => { return 300-jyScale(d.b); })
+        .attr("transform","translate(20,-30)")
+        .attr("r", 3);
+  //  let tt = circles.selectAll("title")
+    //    .data(data);
+      //  .append("title")
+    //    tt.text(function(d) { return ""+d.a+","+d.b });
+ //tt.exit().remove();
+//let coordinates = d3.mouse(this);
 
+
+    circles.on("click", function(d) {
+            let coordinates = d3.mouse(this);
+            console.log("Data points: ("+d.a+", "+d.b+") Coordinates: ("+coordinates[0]+", "+coordinates[1]+")");
+        });
+
+ circles.on("mouseover", function(d){
+   circles.append("title").text(function(d) {
+          return d.a+","+d.b });
+ })
         const plotDimensionX = 240;
-        const plotDimensionY = 240
-        const plot = d3.select('#scatterplot').attr('transform', `translate(30,25)`)
-
-        plot.append('rect').attr('width', plotDimensionX).attr('height', plotDimensionY);
-
-        const xScale = d3.scaleLinear().domain([0, 14]).range([0, plotDimensionX])
-        const yScale = d3.scaleLinear().domain([0, 14]).range([plotDimensionY, 0])
+        const plotDimensionY = 240;
+        const plot = d3.select('#scatterplot').attr('transform', `translate(20,20)`)
 
 
-        const xAxisGroup = plot.append('g').classed('x-axis', true).attr('transform', `translate(0, ${plotDimensionY})`)
-        const yAxisGroup = plot.append('g').classed('y-axis', true);
+        const xScale = d3.scaleLinear().domain([0, 19]).range([0, plotDimensionX])
+        const yScale = d3.scaleLinear().domain([0, 20]).range([plotDimensionY, 0])
+
+
+    //    const xAxisGroup = plot.append('g').classed('x-axis', true).attr('transform', `translate(0, ${plotDimensionY})`)
+    //    const yAxisGroup = plot.append('g').classed('y-axis', true);
+    const xAxisGroup = plot.select('#x-axis').attr('transform', `translate(20,260)`)
+        const yAxisGroup = plot.select('#y-axis');
+
 
         const xAxisScale = d3.axisBottom(xScale);
         const yAxisScale = d3.axisLeft(yScale);
@@ -175,19 +194,39 @@ function update(data) {
   let len = c.length;
   for(let i=0; i< len; i++)
   {
-     console.log(c[i]);
         c[i].addEventListener("mouseover", function() {
-               c[i].style.fill = "yellow";
+               c[i].style.fill = "#AAC0AF";
              });
       c[i].addEventListener("mouseout", function(){
-               c[i].style.fill ="red";
+               c[i].style.fill ="#c7001e";
              });
 
 }
+let rid2 = document.getElementById("bBarChart");
+let c2= rid2.children;
+let len2 = c2.length;
+for(let i=0; i< len2; i++)
+{
+      c2[i].addEventListener("mouseover", function() {
+             c2[i].style.fill = "#AAC0AF";
+           });
+    c2[i].addEventListener("mouseout", function(){
+             c2[i].style.fill ="#086fad";
+           });
 
+}
 // scatter plots hover
+let svgk = d3.select('#scatterplot');
 
-
+let ll = svgk.select('.line-chart');
+let lk = ll.selectAll('#regression-line');
+  lk.data(data)
+  .join("line")
+  .attr("x1", d => {return jjScale(d.a);})
+  .attr("y1", d => {return 40;})
+  .attr("x2", d => {return 70;})
+  .attr("y2", d => {return 80;})
+  ;
 
 
 }
@@ -207,7 +246,8 @@ async function changeData() {
       // else
       update(data); // update w/ full data
     }
-  } catch (error) {
+  }
+   catch (error) {
     alert("Could not load the dataset!");
   }
 }
