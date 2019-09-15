@@ -77,7 +77,7 @@ function update(data) {
       .attr("x", 0 )
       .attr("y", (d,i)=> i*20)
       .attr("transform","scale(-1,1)")
-      .delay(function(d,i){console.log(i) ; return(i*100)});
+      .delay(function(d,i){ return(i*100);});
   //  sel.exit().remove();
 
   // TODO: Select and update the 'b' bar chart bars
@@ -91,7 +91,7 @@ function update(data) {
           .attr("height", 18)
           .attr("x", 0 )
           .attr("y", (d,i)=> i*20)
-          .delay(function(d,i){console.log(i) ; return(i*100)});
+          .delay(function(d,i){return(i*100);});
   // TODO: Select and update the 'a' line chart path using this line generator
 
   let aLineGenerator = d3
@@ -193,7 +193,7 @@ function update(data) {
 
     circles.on("click", function(d) {
             let coordinates = d3.mouse(this);
-            console.log("Data points: ("+d.a+", "+d.b+") Coordinates: ("+coordinates[0]+", "+coordinates[1]+")");
+            console.log("Data points: ("+d.a+", "+d.b+") ");
         });
 
  circles.on("mouseover", function(d){
